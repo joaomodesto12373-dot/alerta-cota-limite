@@ -1,42 +1,28 @@
 using System;
+using System.IO;
+using Newtonsoft.Json;
 using AlertaCotaLimite.Models;
 
 namespace AlertaCotaLimite.Services
 {
     public class ConfigService
     {
-        public Config LoadConfig()
+        public Config LoadConfig(string configPath = "appsettings.json")
         {
             try
             {
-                string email = Environment.GetEnvironmentVariable("ALERT_EMAIL");
-                string smtpServer = Environment.GetEnvironmentVariable("SMTP_SERVER");
-                string smtpPortStr = Environment.GetEnvironmentVariable("SMTP_PORT");
-                string smtpUsername = Environment.GetEnvironmentVariable("SMTP_USERNAME");
-                string smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
-
-                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(smtpServer) || 
-                    string.IsNullOrEmpty(smtpUsername) || string.IsNullOrEmpty(smtpPassword))
+                if (!File.Exists(configPath))
                 {
-                    throw new InvalidOperationException("Variáveis de ambiente não configuradas. Defina: ALERT_EMAIL, SMTP_SERVER, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD");
+                    throw new FileNotFoundException($"Arquivo de configuração não encontrado: {configPath}");
                 }
 
-                if (!int.TryParse(smtpPortStr, out int smtpPort))
-                {
-                    throw new InvalidOperationException("SMTP_PORT deve ser um número inteiro");
-                }
+                string json = File.ReadAllText(configPath);
+                Config config = JsonConvert.DeserializeObject<Config>(json);
 
-                Config config = new Config
+                if (config == null || string.IsNullOrEmpty(config.Email) || config.Smtp == null)
                 {
-                    Email = email,
-                    Smtp = new SmtpConfig
-                    {
-                        Server = smtpServer,
-                        Port = smtpPort,
-                        Username = smtpUsername,
-                        Password = smtpPassword
-                    }
-                };
+                    throw new InvalidOperationException("Configuração inválida ou incompleta no arquivo");
+                }
 
                 return config;
             }
@@ -48,4 +34,3 @@ namespace AlertaCotaLimite.Services
         }
     }
 }
-
