@@ -1,2 +1,106 @@
-# alerta-cota-limite
-Desafio Inoa
+# Alerta de cota limite
+
+## Objetivo do Projeto
+
+O projeto consiste em uma aplicação de console desenvolvida em C# (.NET) cujo propósito é o **monitoramento contínuo da cotação de um ativo financeiro** e o **disparo de alertas por e-mail** quando o preço atinge limites pré-definidos de compra ou venda.
+
+## Instruções de Uso
+
+Para execução desta aplicação, o usuário deve seguir os passos descritos abaixo, garantindo que o ambiente de execução esteja devidamente configurado.
+
+### 1. Pré-requisitos
+
+Para compilar e executar o projeto, é necessário possuir:
+
+- **SDK do .NET** (versão compatível com o projeto).
+
+- **Git** (para clonagem do repositório).
+
+- **Newtonsoft.Json** (pacote NuGet para manipulação de JSON).
+
+### 2. Configuração de Variáveis de Ambiente
+
+**Veja que** a segurança é um aspecto fundamental deste sistema. Assim, as credenciais de e-mail não são armazenadas no código-fonte, mas sim em **variáveis de ambiente**.
+
+O usuário deve definir as seguintes variáveis em seu sistema operacional antes da execução:
+
+| Variável | Descrição | Exemplo de Valor |
+| --- | --- | --- |
+| `ALERT_EMAIL` | E-mail de destino para o recebimento dos alertas. | `seu.email@gmail.com` |
+| `SMTP_SERVER` | Servidor SMTP para envio de e-mails. | `smtp.gmail.com` |
+| `SMTP_PORT` | Porta do servidor SMTP. | `587` |
+| `SMTP_USERNAME` | Usuário de autenticação do SMTP. | `seu.email@gmail.com` |
+| `SMTP_PASSWORD` | Senha de autenticação do SMTP (recomenda-se o uso de senha de app). | `sua_app_password` |
+
+### 3. Execução da Aplicação
+
+A aplicação é executada via linha de comando, aceitando 3 ou 4 argumentos.
+
+**A sintaxe fundamental é:**
+
+```bash
+dotnet run <SIMBOLO> <PRECO_VENDA> <PRECO_COMPRA> [reset]
+```
+
+#### Exemplo de Uso (Monitoramento Padrão)
+
+Para monitorar o ativo `PETR4` com um limite de venda em `32.70` e um limite de compra em `32.50`:
+
+```bash
+dotnet run PETR4 32.70 32.50
+```
+
+**Veja que** a ordem dos preços de venda e compra não é estritamente necessária, pois automaticamente identificamos o maior valor como o limite de venda e o menor como o limite de compra.
+
+#### Exemplo de Uso (Reset de Memória)
+
+Para iniciar o monitoramento e, antes de tudo, **apagar o histórico de alertas** (garantindo que um novo alerta seja enviado imediatamente se a condição for atendida):
+
+```bash
+dotnet run PETR4 32.70 32.50 reset
+```
+
+**Assim chegamos** à funcionalidade de persistência, que garante que o alerta só seja enviado uma vez por evento, a menos que o estado seja explicitamente resetado.
+
+---
+
+## Processo de Desenvolvimento 
+
+O desenvolvimento deste projeto foi conduzido sob o princípio da **Separação de Responsabilidades**, resultando em uma arquitetura modular e de fácil manutenção. Commo imagino que se de o trabalho da Inoa.
+
+### 1. Estrutura e Componentes
+
+**Veja que** a aplicação foi dividida em componentes especializados, cada um com uma função bem definida:
+
+| Componente | Classe(s) | Responsabilidade Primária |
+| --- | --- | --- |
+| **Ponto de Entrada** | `Program.cs` | Valida argumentos, carrega configurações, inicializa todos os serviços e o `AlertMonitor`. |
+| **Configuração** | `Config.cs`, `ConfigService.cs` | Define a estrutura de dados para as configurações e carrega as credenciais de e-mail a partir das variáveis de ambiente. |
+| **Cotação** | `QuoteService.cs` | Realiza requisições HTTP assíncronas à API `Brapi` para obter o preço atual do ativo. |
+| **Alerta** | `EmailService.cs` | Conecta-se ao servidor SMTP (com SSL e autenticação) para formatar e enviar e-mails de alerta. |
+| **Monitoramento** | `AlertMonitor.cs` | Orquestra o *loop* contínuo de monitoramento, chama o `QuoteService`, aplica a lógica de limites e chama o `EmailService`. |
+| **Persistência** | `AlertState.cs`, `FileAlertPersistenceService.cs` | **Melhoria Implementada:** Armazena o estado (`BuyAlertSent`, `SellAlertSent`) em um arquivo JSON (`alertState.json`) para evitar o envio de alertas duplicados após reinicializações do programa. |
+
+### 2. Fluxo de Execução e Lógica de Alerta
+
+**Chegamos** então ao fluxo de execução, que é iniciado pelo `Program.cs` e orquestrado pelo `AlertMonitor`:
+
+1. **Inicialização:** O `Program.cs` carrega as configurações e inicializa o `AlertMonitor`, injetando os serviços (`QuoteService`, `EmailService`, `FileAlertPersistenceService`) e os parâmetros de monitoramento.
+
+1. **Carregamento do Estado:** O `AlertMonitor` **carrega o estado de persistência** (`AlertState`) do disco.
+
+1. **Loop Contínuo:** O `AlertMonitor` entra em um *loop* infinito, onde a cada intervalo de tempo (30s):
+  - O `QuoteService` é chamado para obter o preço atual.
+  - O preço é comparado com os limites de compra e venda.
+  - Note que o alerta só é disparado se a condição for atendida **E** o respectivo *flag* no `AlertState` estiver como `false`.
+
+1. **Atualização do Estado:** Após a verificação, o `AlertMonitor` atualiza o `AlertState` (marcando o alerta como enviado) e o `FileAlertPersistenceService` **salva** o novo estado no disco.
+
+1. **Reversão de Tendência:** A lógica de alerta inclui um mecanismo de *reset* interno: se um alerta de compra foi enviado e o preço se afasta do limite de compra (subindo), o *flag* `BuyAlertSent` é zerado, permitindo que um novo alerta seja enviado em um ciclo futuro.
+
+**Assim, demonstramos** que a aplicação não apenas atende aos requisitos básicos de monitoramento, mas também incorpora mecanismos de resiliência e usabilidade essenciais para um sistema de monitoramento financeiro.
+
+
+
+
+

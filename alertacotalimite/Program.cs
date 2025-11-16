@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using AlertaCotaLimite.Models;
 using AlertaCotaLimite.Services;
- using System.Globalization;
+using System.Globalization;
 
 namespace AlertaCotaLimite
 {
@@ -12,10 +12,11 @@ namespace AlertaCotaLimite
         {
             try
             {
-                if (args.Length != 3)
+                if (args.Length < 3 || args.Length > 4)
                 {
-                    Console.WriteLine("Uso: dotnet run <SYMBOL> <SELL_PRICE> <BUY_PRICE>");
+                    Console.WriteLine("Uso: dotnet run <SYMBOL> <SELL_PRICE> <BUY_PRICE> [reset]");
                     Console.WriteLine("Exemplo: dotnet run PETR4 22.67 22.59");
+                    Console.WriteLine("Exemplo com reset: dotnet run PETR4 22.67 22.59 reset");
                     return;
                 }
 
@@ -46,8 +47,17 @@ namespace AlertaCotaLimite
                 QuoteService quoteService = new QuoteService();
                 EmailService emailService = new EmailService(config);
 
+                // v3
+                FileAlertPersistenceService persistenceService = new FileAlertPersistenceService(); 
+
+                // Verificar reset foi passado
+                if (args.Length == 4 && args[3].Equals("reset", StringComparison.OrdinalIgnoreCase))
+                {
+                    persistenceService.ResetState();
+                }
+
                 // Criar monitor e iniciar
-                AlertMonitor monitor = new AlertMonitor(quoteService, emailService, symbol, buyPrice, sellPrice);
+                AlertMonitor monitor = new AlertMonitor(quoteService, emailService, persistenceService, symbol, buyPrice, sellPrice);
                 await monitor.StartMonitoring(30); // 30s
             }
             catch (Exception ex)
@@ -58,4 +68,3 @@ namespace AlertaCotaLimite
         }
     }
 }
-
