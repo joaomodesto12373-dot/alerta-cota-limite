@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("alertacotalimite")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aac9dc1f62780e69db54d51be4581e6e182ca930")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d66fc82ed2368d67b899249dab47009199f5a319")]
 [assembly: System.Reflection.AssemblyProductAttribute("alertacotalimite")]
 [assembly: System.Reflection.AssemblyTitleAttribute("alertacotalimite")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
