@@ -6,10 +6,10 @@ namespace AlertaCotaLimite.Models
         public bool SellAlertSent { get; set; } = false;
         public decimal LastPrice { get; set; } = 0;
         
-        // NOVO: Armazena o preço que disparou o último alerta de compra
+        // Armazena o preço que disparou o último alerta de compra
         public decimal LastBuyAlertPrice { get; set; } = 0; 
         
-        // NOVO: Armazena o preço que disparou o último alerta de venda
+        // Armazena o preço que disparou o último alerta de venda e imprime 
         public decimal LastSellAlertPrice { get; set; } = 0; 
     }
 }
