@@ -18,19 +18,33 @@ Para compilar e executar o projeto, é necessário possuir:
 
 - **Newtonsoft.Json** (pacote NuGet para manipulação de JSON).
 
-### 2. Configuração de Variáveis de Ambiente
+### 2. Configuração do Arquivo `appsettings.json`
 
-**Veja que** a segurança é um aspecto fundamental deste sistema. Assim, as credenciais de e-mail não são armazenadas no código-fonte, mas sim em **variáveis de ambiente**.
+A aplicação carrega todas as configurações, incluindo as credenciais de e-mail, **diretamente do arquivo ****`appsettings.json`**.
 
-O usuário deve definir as seguintes variáveis em seu sistema operacional antes da execução:
+**IMPORTANTE:** O arquivo `appsettings.json` deve ser criado **dentro da pasta do projeto** (`alertacotalimite/`).
 
-| Variável | Descrição | Exemplo de Valor |
+A estrutura do arquivo deve ser a seguinte:
+
+#### Exemplo de Estrutura Correta:
+
+```json
+{
+  "Email": "cliente.email@destino.com",
+  "Smtp": "smtp.meuprovedor.com",
+  "Port": 587,
+  "Username": "meu.email@autenticacao.com",
+  "Password": "minha_senha_ou_app_password"
+}
+```
+
+| Propriedade | Função | Exemplo de Valor |
 | --- | --- | --- |
-| `ALERT_EMAIL` | E-mail de destino para o recebimento dos alertas. | `seu.email@gmail.com` |
-| `SMTP_SERVER` | Servidor SMTP para envio de e-mails. | `smtp.gmail.com` |
-| `SMTP_PORT` | Porta do servidor SMTP. | `587` |
-| `SMTP_USERNAME` | Usuário de autenticação do SMTP. | `seu.email@gmail.com` |
-| `SMTP_PASSWORD` | Senha de autenticação do SMTP (recomenda-se o uso de senha de app). | `sua_app_password` |
+| `Email` | E-mail de destino para o recebimento dos alertas. | `cliente.email@destino.com` |
+| `Smtp` | Servidor SMTP para envio de e-mails. | `smtp.meuprovedor.com` |
+| `Port` | Porta do servidor SMTP. | `587` |
+| `Username` | Usuário de autenticação do SMTP. | `meu.email@autenticacao.com` |
+| `Password` | Senha de autenticação do SMTP (recomenda-se o uso de senha de app). | `minha_senha_ou_app_password` |
 
 ### 3. Execução da Aplicação
 
