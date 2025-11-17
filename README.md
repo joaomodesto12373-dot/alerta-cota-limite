@@ -74,7 +74,7 @@ Para iniciar o monitoramento e, antes de tudo, **apagar o histórico de alertas*
 dotnet run PETR4 32.70 32.50 reset
 ```
 
-**Assim chegamos** à funcionalidade de persistência, que garante que o alerta só seja enviado uma vez por evento, a menos que o estado seja explicitamente resetado.
+**OBS: Execute o comando dotnet run na pasta alertacotalimite.**
 
 ---
 
