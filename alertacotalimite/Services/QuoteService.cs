@@ -26,20 +26,21 @@ namespace AlertaCotaLimite.Services
 
                 if (priceToken == null)
                 {
-                    throw new Exception($"Preço não encontrado na resposta da API para o símbolo {symbol}.");
+                    Console.WriteLine($"Aviso: Preço não encontrado na resposta da API para o símbolo {symbol}.");
+                    return 0; // Retorna 0 em vez de lançar exceção
                 }
 
                 return priceToken.Value<decimal>();
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"Erro de requisição ao buscar cotação: {e.Message}");
-                throw;
+                Console.WriteLine($"Aviso: Erro de requisição ao buscar cotação (Rede/API): {e.Message}. Retornando 0.");
+                return 0; // Retorna 0 em caso de falha de rede/API
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Erro ao processar cotação: {e.Message}");
-                throw;
+                Console.WriteLine($"Aviso: Erro ao processar cotação: {e.Message}. Retornando 0.");
+                return 0; // Retorna 0 em caso de outros erros
             }
         }
     }

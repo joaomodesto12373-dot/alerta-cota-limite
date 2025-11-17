@@ -25,7 +25,7 @@ namespace AlertaCotaLimite.Services
 
                     MailMessage mailMessage = new MailMessage();
                     mailMessage.From = new MailAddress(_config.Email);
-                    mailMessage.To.Add(_config.Email); // Envia para o mesmo email
+                    mailMessage.To.Add(_config.Email); 
                     mailMessage.Subject = $"ALERTA DE COTAÇÃO: {alertType} para {symbol}";
                     mailMessage.Body = $"O ativo {symbol} atingiu o limite de {alertType} com o preço de R$ {currentPrice:F2} em {DateTime.Now}.";
 

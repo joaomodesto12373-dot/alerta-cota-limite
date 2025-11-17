@@ -7,12 +7,10 @@ namespace AlertaCotaLimite.Services
 {
     public class ConfigService
     {
-        // Força a leitura de todas as configurações do appsettings.json
         public Config LoadConfig(string configPath = "appsettings.json")
         {
             if (!File.Exists(configPath))
             {
-                // Erro fatal se o arquivo não for encontrado, conforme o requisito de leitura de arquivo.
                 throw new FileNotFoundException($"Erro fatal: Arquivo de configuração não encontrado: {configPath}");
             }
 
@@ -20,7 +18,6 @@ namespace AlertaCotaLimite.Services
             {
                 string jsonString = File.ReadAllText(configPath);
                 
-                // Deserializa o JSON. O operador ?? new Config() garante que o objeto não seja nulo.
                 Config config = JsonSerializer.Deserialize<Config>(jsonString) ?? new Config();
 
                 // Verifica se as credenciais essenciais foram lidas
