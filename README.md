@@ -114,6 +114,17 @@ O desenvolvimento deste projeto foi conduzido sob o princípio da **Separação 
 
 **Assim, demonstramos** que a aplicação não apenas atende aos requisitos básicos de monitoramento, mas também incorpora mecanismos de resiliência e usabilidade essenciais para um sistema de monitoramento financeiro.
 
+### 3. Melhorias  e Usabilidade 
+
+1. **Robustez da API (****`QuoteService.cs`****):**
+  - O serviço de cotação utiliza um bloco `try-catch` para lidar com falhas de rede ou erros da API. Em caso de falha, ele registra um aviso no console e **retorna um valor neutro (****`0`****)**, garantindo que o *loop* de monitoramento não seja interrompido.
+
+1. **Lógica de Novo Alerta por Limite mais Agressivo:**
+  - A persistência foi criada para armazenar o último preço que disparou o alerta.
+  - Se o usuário iniciar o monitoramento com um limite **mais agressivo** do que o limite anterior (ex: Venda em R$33.00, e o limite anterior era R$32.50), a aplicação **reseta o *****flag***** de alerta** para permitir um novo disparo, mesmo que o alerta já tenha sido enviado anteriormente.
+
+1. **Informações de Inicialização (****`AlertMonitor.cs`****):**
+  - Ao iniciar, a aplicação exibe o **intervalo de consulta** e, se o arquivo de persistência existir, o **último preço salvo** e o **status atual dos alertas** (se já foram enviados ou não).
 
 
 
