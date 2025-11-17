@@ -1,5 +1,5 @@
 {
   "BuyAlertSent": false,
-  "SellAlertSent": false,
+  "SellAlertSent": true,
   "LastPrice": 32.7
 }

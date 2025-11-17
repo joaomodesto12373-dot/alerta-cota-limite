@@ -7,35 +7,38 @@ namespace AlertaCotaLimite.Services
 {
     public class QuoteService
     {
-        private readonly HttpClient _httpClient;
-        private const string BrapiUrl = "https://brapi.dev/api/quote/";
-
-        public QuoteService( )
-        {
-            _httpClient = new HttpClient( );
-        }
+        private readonly HttpClient _httpClient = new HttpClient();
+        private const string ApiUrl = "https://brapi.dev/api/quote/";
 
         public async Task<decimal> GetCurrentPrice(string symbol)
         {
             try
             {
-                string url = $"{BrapiUrl}{symbol}";
-                HttpResponseMessage response = await _httpClient.GetAsync(url );
+                string url = $"{ApiUrl}{symbol}?modules=summaryProfile&token=SUA_CHAVE_AQUI";
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
 
-                if (!response.IsSuccessStatusCode)
+                string responseBody = await response.Content.ReadAsStringAsync();
+                
+                JObject json = JObject.Parse(responseBody);
+                
+                JToken? priceToken = json["results"]?[0]?["regularMarketPrice"];
+
+                if (priceToken == null)
                 {
-                    throw new Exception($"Erro ao buscar cotação: {response.StatusCode}");
+                    throw new Exception($"Preço não encontrado na resposta da API para o símbolo {symbol}.");
                 }
 
-                string content = await response.Content.ReadAsStringAsync();
-                JObject json = JObject.Parse(content);
-
-                decimal price = json["results"][0]["regularMarketPrice"].Value<decimal>();
-                return price;
+                return priceToken.Value<decimal>();
             }
-            catch (Exception ex)
+            catch (HttpRequestException e)
             {
-                Console.WriteLine($"Erro ao obter preço de {symbol}: {ex.Message}");
+                Console.WriteLine($"Erro de requisição ao buscar cotação: {e.Message}");
+                throw;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Erro ao processar cotação: {e.Message}");
                 throw;
             }
         }

@@ -1,7 +1,7 @@
+using AlertaCotaLimite.Models;
 using System;
 using System.Net;
 using System.Net.Mail;
-using AlertaCotaLimite.Models;
 
 namespace AlertaCotaLimite.Services
 {
@@ -18,25 +18,24 @@ namespace AlertaCotaLimite.Services
         {
             try
             {
-                using (SmtpClient smtpClient = new SmtpClient(_config.Smtp.Server, _config.Smtp.Port))
+                using (SmtpClient client = new SmtpClient(_config.Smtp, _config.Port))
                 {
-                    smtpClient.EnableSsl = true;
-                    smtpClient.Credentials = new NetworkCredential(_config.Smtp.Username, _config.Smtp.Password);
+                    client.EnableSsl = true;
+                    client.Credentials = new NetworkCredential(_config.Username, _config.Password);
 
-                    string subject = $"Alerta de Cotação: {symbol}";
-                    string body = $"O ativo {symbol} atingiu o preço de R$ {currentPrice:F2}.\n" +
-                                  $"Tipo de alerta: {alertType}";
+                    MailMessage mailMessage = new MailMessage();
+                    mailMessage.From = new MailAddress(_config.Email);
+                    mailMessage.To.Add(_config.Email); // Envia para o mesmo email
+                    mailMessage.Subject = $"ALERTA DE COTAÇÃO: {alertType} para {symbol}";
+                    mailMessage.Body = $"O ativo {symbol} atingiu o limite de {alertType} com o preço de R$ {currentPrice:F2} em {DateTime.Now}.";
 
-                    MailMessage mailMessage = new MailMessage(_config.Smtp.Username, _config.Email, subject, body);
-
-                    smtpClient.Send(mailMessage);
-                    Console.WriteLine($"E-mail enviado com sucesso para {_config.Email}");
+                    client.Send(mailMessage);
+                    Console.WriteLine($"Alerta de {alertType} enviado para {_config.Email} com sucesso.");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
-                throw;
             }
         }
     }
