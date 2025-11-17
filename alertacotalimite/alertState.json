@@ -1,7 +1,7 @@
 {
   "BuyAlertSent": false,
-  "SellAlertSent": true,
-  "LastPrice": 32.9,
+  "SellAlertSent": false,
+  "LastPrice": 0.0,
   "LastBuyAlertPrice": 0.0,
-  "LastSellAlertPrice": 32.80
+  "LastSellAlertPrice": 0.0
 }
